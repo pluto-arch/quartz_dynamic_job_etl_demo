@@ -1,2 +1,2 @@
-# quzrtz_dynamic_job_etl_demo
-quzrtz dynamic job f or etl system demo
+# quartz_dynamic_job_etl_demo
+quartz dynamic job f or etl system demo
