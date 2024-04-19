@@ -1,0 +1,16 @@
+{
+  "Jobs": [
+    {
+      "LineId": "1号线",
+      "Corn": "0/5 * * * * ?",
+      "Enabled": true,
+      "DataSourceName": "Line1DataSource"
+    },
+    {
+      "LineId": "2号线",
+      "Corn": "0/2 * * * * ?",
+      "Enabled": true,
+      "DataSourceName": "Line2DataSource"
+    }
+  ]
+}
