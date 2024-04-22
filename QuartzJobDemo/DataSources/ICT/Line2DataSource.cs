@@ -1,47 +1,46 @@
 ﻿using System.Data;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using QuartzJobDemo.Dtos;
 
 namespace QuartzJobDemo.DataSources;
 
-public class Line2DataSource: AbstractDataSource
+public class Line2DataSource: IDataSource<List<DemoDto>> 
 {
-    private readonly ILogger<Line1DataSource> _logger;
+    private readonly FetcherContextAccesor _accesor;
+    private readonly ILogger<Line2DataSource> _logger;
 
-    public Line2DataSource(FetcherContextAccesor accesor,ILogger<Line1DataSource> logger):base(accesor)
+    public Line2DataSource(FetcherContextAccesor accesor,ILogger<Line2DataSource> logger)
     {
+        _accesor = accesor;
         _logger = logger;
     }
 
 
     /// <inheritdoc />
-    public override Task<DataTable> FetchDataAsync()
+    public Task<List<DemoDto>> FetchDataAsync()
     {
-        var ctx= _accesor.CurrentFetcherContext;
-        _logger.LogInformation("Line2DataSource 处理 {LineId} 的数据",ctx.LineId);
-
-
-        var dt=new DataTable();
-        dt.Columns.Add("ID", typeof(int));
-        dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Age", typeof(int));
-        dt.Columns.Add("Time", typeof(DateTime));
-
-        dt.Rows.Add(1, "Alice", 25,DateTime.Now);
-        dt.Rows.Add(2, "Bob", 30,DateTime.Now);
-        dt.Rows.Add(3, "Charlie", 22,DateTime.Now);
-
-        return Task.FromResult(dt);
-
-    }
-
-    /// <inheritdoc />
-    public override Task TransformData(DataTable data)
-    {
-        // 遍历DataTable并打印数据
-        foreach (DataRow row in data.Rows)
+        var data= new List<DemoDto>();
+        foreach (var row in Enumerable.Range(1, 100000))
         {
-            _logger.LogInformation($"Age：{row["Age"]}");
+            data.Add(new DemoDto
+            {
+                ID=row,
+                Name="Alice",
+                Age=22
+            });
         }
-        return Task.CompletedTask;
+
+        foreach (var row in Enumerable.Range(100000, 300000))
+        {
+            data.Add(new DemoDto
+            {
+                ID=row+2,
+                Name="Alice",
+                Age=22
+            });
+        }
+        _logger.LogInformation("Line2DataSource has been executed. 数量：{Count}",data.Count);
+        return Task.FromResult(data);
     }
 }

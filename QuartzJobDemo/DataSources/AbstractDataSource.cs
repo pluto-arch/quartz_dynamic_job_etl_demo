@@ -2,7 +2,8 @@
 
 namespace QuartzJobDemo.DataSources;
 
-public abstract class AbstractDataSource : IDataSource<DataTable>
+public abstract class AbstractDataSource<T> :IDataSource<T>
+    //: IDataSource
 {
     protected readonly FetcherContextAccesor _accesor;
 
@@ -11,10 +12,6 @@ public abstract class AbstractDataSource : IDataSource<DataTable>
         _accesor = accesor;
     }
 
-    /// <inheritdoc />
-    public abstract Task<DataTable> FetchDataAsync();
-    
+    public abstract Task<T> FetchDataAsync();
 
-    /// <inheritdoc />
-    public abstract Task TransformData(DataTable data);
 }

@@ -1,44 +1,46 @@
 ﻿using System.Data;
 using Microsoft.Extensions.Logging;
+using Quartz.Logging;
+using QuartzJobDemo.Dtos;
 
 namespace QuartzJobDemo.DataSources;
 
-public class Line1DataSource:AbstractDataSource
+public class Line1DataSource : IDataSource<List<DemoDto>>
 {
+    private readonly FetcherContextAccesor _accesor;
     private readonly ILogger<Line1DataSource> _logger;
 
-    public Line1DataSource(FetcherContextAccesor accesor,ILogger<Line1DataSource> logger):base(accesor)
+    public Line1DataSource(FetcherContextAccesor accesor, ILogger<Line1DataSource> logger)
     {
+        _accesor = accesor;
         _logger = logger;
     }
 
 
     /// <inheritdoc />
-    public override Task<DataTable> FetchDataAsync()
+    public Task<List<DemoDto>> FetchDataAsync()
     {
-        var ctx= _accesor.CurrentFetcherContext;
-        _logger.LogInformation("Line1DataSource 处理 {LineId} 的数据",ctx.LineId);
-
-        var dt=new DataTable();
-        dt.Columns.Add("ID", typeof(int));
-        dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Age", typeof(int));
-
-        dt.Rows.Add(1, "Alice", 25);
-        dt.Rows.Add(2, "Bob", 30);
-        dt.Rows.Add(3, "Charlie", 22);
-
-        return Task.FromResult(dt);
-    }
-
-    /// <inheritdoc />
-    public override Task TransformData(DataTable data)
-    {
-        // 遍历DataTable并打印数据
-        foreach (DataRow row in data.Rows)
+        var data = new List<DemoDto>();
+        foreach (var row in Enumerable.Range(1, 100000))
         {
-            _logger.LogInformation($"Name：{row["Name"]}");
+            data.Add(new DemoDto
+            {
+                ID = row,
+                Name = "Alice",
+                Age = 22
+            });
         }
-        return Task.CompletedTask;
+
+        foreach (var row in Enumerable.Range(100000, 300000))
+        {
+            data.Add(new DemoDto
+            {
+                ID = row + 2,
+                Name = "Alice",
+                Age = 22
+            });
+        }
+        _logger.LogInformation("数量：{Count}",data.Count);
+        return Task.FromResult(data);
     }
 }

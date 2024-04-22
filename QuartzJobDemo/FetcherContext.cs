@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Data;
+using Microsoft.Extensions.DependencyInjection;
 using QuartzJobDemo.DataSources;
 
 namespace QuartzJobDemo;
@@ -67,10 +68,24 @@ public class FetcherContext:IDisposable
         return dataSource;
     }
 
-    /// <inheritdoc />
+    private bool disposedValue;
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                _scoped?.Dispose();
+            }
+            disposedValue = true;
+        }
+    }
+
     public void Dispose()
     {
-        _scoped?.Dispose();
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -107,6 +122,7 @@ public class FetcherContextAccesor
         {
             CurrentFetcherContext = parentScope;
             context?.Dispose();
+            context=null;
         });
     }
 }

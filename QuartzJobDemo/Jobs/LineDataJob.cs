@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using QuartzJobDemo.DataSources;
+using QuartzJobDemo.Dtos;
 
 namespace QuartzJobDemo.Jobs;
 
@@ -29,9 +30,8 @@ public class LineDataJob:IJob
         _logger.LogInformation("{lineId} has been executed",lineId);
         using (_accesor.Begin(lineId,dataSourceName,null))
         {
-            var dataSource= _accesor.CurrentFetcherContext.ResolveDataSource<DataTable>();
-            var data = await dataSource.FetchDataAsync();
-            await dataSource.TransformData(data);
+            var dataSource= _accesor.CurrentFetcherContext.ResolveDataSource<List<DemoDto>>();
+             var data = await dataSource.FetchDataAsync();
         }
     }
 }
